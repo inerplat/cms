@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cms
+  name: cms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cms
+  template:
+    metadata:
+      labels:
+        app: cms
+    spec:
+      containers:
+      - image: dhub.inerplat.com/inerplat/cms
+        name: cms
+        command: ["/bin/sh", "-c", "/usr/local/bin/init-script.sh"]
+        env:
+          CMS_CONFIG: /usr/local/etc/cms-testdb.conf
+          PYTEST_ADDOPTS: --color=yes
+        volumeMounts:
+        - name: codecov-volume
+          mountPath: /home/cmsuser/cms/codecov
+        - name: init-script-volume
+          mountPath: /usr/local/bin/init-script.sh
+          subPath: init-script.sh
+      volumes:
+      - name: codecov-volume
+        emptyDir: {}
+      - name: init-script-volume
+        configMap:
+          name: test-cms-init-script
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cms-init-script
+data:
+  init-script.sh: |
+    #!/bin/sh
+    set -e
+    sudo sed 's|/cmsuser:your_password_here@localhost:5432/cmsdb"|/postgres:postgres@cms-postgres:5432/cmsdbfortesting"|' ./config/cms.conf.sample
+    sudo tee /usr/local/etc/cms-testdb.conf
+    dropdb --host=cms-postgres --username=postgres --password postgres cmsdb
+    createdb --host=cms-postgres --username=postgres --password postgres cmsdb
+    cmsInitDB
+    sudo chown cmsuser:cmsuser ./codecov
+    pytest --cov . --cov-report xml:codecov/unittests.xml
+    dropdb --host=cms-postgres --username=postgres --password postgres cmsdb
+    createdb --host=cms-postgres --username=postgres --password postgres cmsdb
+    cmsInitDB
+    cmsRunFunctionalTests -v --coverage codecov/functionaltests.xml

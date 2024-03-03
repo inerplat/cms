@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cms-postgres
+spec:
+  serviceName: cms-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cms-postgres
+  template:
+    metadata:
+      labels:
+        app: cms-postgres
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: worker1-ubuntu-seoul
+      containers:
+        - name: postgres
+          image: postgres:13
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: cms-postgres-config
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: cms-postgres-volume
+              subPath: postgres
+            - name: cms-postgres-initdb
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: cms-postgres-initdb
+          configMap:
+            name: cms-postgres-initdb-config
+  volumeClaimTemplates:
+    - metadata:
+        name: cms-postgres-volume
+      spec:
+        storageClassName: nfs-client-w1
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cms-postgres
+  labels:
+    app: cms-postgres
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+  selector:
+    app: cms-postgres
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cms-postgres-config
+  labels:
+    app: cms-postgres
+data:
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+---  
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cms-postgres-initdb-config
+data:
+  init-db.sql: |
+    CREATE USER cmsuser WITH PASSWORD 'cmsuser';
+    CREATE DATABASE cmsdb WITH OWNER cmsuser;
+    ALTER SCHEMA public OWNER TO cmsuser;
+    GRANT SELECT ON pg_largeobject TO cmsuser;
