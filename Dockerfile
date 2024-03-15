@@ -25,7 +25,8 @@ RUN apt-get install -y \
     rustc \
     sudo \
     wait-for-it \
-    zip
+    zip \
+    socat
 
 # Create cmsuser user with sudo privileges
 RUN useradd -ms /bin/bash cmsuser && \
@@ -49,8 +50,7 @@ RUN sudo python3 setup.py install
 
 RUN sudo python3 prerequisites.py --yes --cmsuser=cmsuser install
 
-RUN sudo sed 's|/cmsuser:your_password_here@localhost:5432/cmsdb"|/postgres@testdb:5432/cmsdbfortesting"|' ./config/cms.conf.sample \
-    | sudo tee /usr/local/etc/cms-testdb.conf
+COPY config/cms-k8s.conf /usr/local/etc/cms.conf
 
 ENV LANG C.UTF-8
 

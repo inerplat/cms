@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: cms-postgres
+  namespace: cms
 spec:
   serviceName: cms-postgres
   replicas: 1
@@ -48,6 +49,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: cms-postgres
+  namespace: cms
   labels:
     app: cms-postgres
 spec:
@@ -63,6 +65,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cms-postgres-config
+  namespace: cms
   labels:
     app: cms-postgres
 data:
@@ -74,6 +77,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cms-postgres-initdb-config
+  namespace: cms
 data:
   init-db.sql: |
     CREATE USER cmsuser WITH PASSWORD 'cmsuser';
