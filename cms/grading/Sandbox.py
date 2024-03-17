@@ -899,7 +899,7 @@ class IsolateSandbox(SandboxBase):
 
         # Default parameters for isolate
         self.box_id = box_id           # -b
-        self.cgroup = config.use_cgroups  # --cg
+        self.cgroup = False # config.use_cgroups  # --cg
         self.chdir = self._home_dest   # -c
         self.dirs = []                 # -d
         self.preserve_env = False      # -e
