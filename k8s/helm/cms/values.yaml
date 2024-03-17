@@ -15,6 +15,16 @@ admin:
     tls:
       enabled: true
       secretName: cms-admin-tls
+  score:
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      host: cms-score.inerplat.com
+      tls:
+        enabled: true
+        secretName: cms-score-tls
 contest:
   enabled: true
   ingress:

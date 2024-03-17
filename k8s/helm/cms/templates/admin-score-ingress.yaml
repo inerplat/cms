@@ -1,0 +1,30 @@
+{{- if .Values.admin.score.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    {{- range $key, $value := .Values.admin.score.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  name: cms-score
+  namespace: {{ .Release.Namespace }}
+spec:
+  ingressClassName: nginx
+  {{- if .Values.admin.score.ingress.tls.enabled }}
+  tls:
+    - secretName: {{ .Values.admin.score.ingress.tls.secretName }}
+      hosts:
+        - {{ .Values.admin.score.ingress.host }}
+  {{- end }}
+  rules:
+  - host: {{ .Values.admin.score.ingress.host }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: cms-admin
+            port:
+              number: 8890
+        path: /
+        pathType: Prefix
+{{- end }}
