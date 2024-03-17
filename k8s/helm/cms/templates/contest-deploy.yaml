@@ -1,0 +1,40 @@
+{{- if .Values.contest.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cms-contest
+  name: cms-contest
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cms-contest
+  template:
+    metadata:
+      labels:
+        app: cms-contest
+    spec:
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "cms-contest"
+      containers:
+      - image: {{ .Values.contest.image.repository }}:{{ .Values.contest.image.tag }}
+        imagePullPolicy: {{ .Values.contest.image.pullPolicy }}
+        name: resource
+        command: ["cmsResourceService", "-a", "1"]
+        env:
+          - name: CMS_CONFIG
+            value: /usr/local/etc/cms.conf
+        volumeMounts:
+        - name: cms-config
+          mountPath: /usr/local/etc/cms.conf
+          subPath: cms.conf
+      volumes:
+      - name: cms-config
+        configMap:
+          name: {{ .Values.contest.configMap.name }}
+          defaultMode: {{ .Values.contest.configMap.defaultMode }}
+{{- end }}

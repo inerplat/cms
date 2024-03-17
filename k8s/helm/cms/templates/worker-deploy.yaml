@@ -1,0 +1,50 @@
+{{- if .Values.worker.enabled }}
+{{- range $i, $worker := until (int .Values.worker.replicas | default 1) }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cms-worker{{ add1 $i }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: cms-worker{{ add1 $i }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cms-worker{{ add1 $i }}
+  template:
+    metadata:
+      labels:
+        app: cms-worker{{ add1 $i }}
+    spec:
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "cms-worker{{ add1 $i }}"
+      shareProcessNamespace: true
+      containers:
+      - name: worker
+        image: inerplat/cms
+        imagePullPolicy: Always
+        command: ["/home/cmsuser/cms/scripts/cmsResourceService", "-a", "1"]
+        securityContext:
+          privileged: true
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/bash", "-c", "socat TCP-LISTEN:26001,reuseaddr,fork TCP:localhost:26000 > /dev/null 2>&1 &"]
+        volumeMounts:
+        - name: cms-config
+          mountPath: /usr/local/etc/cms.conf
+          subPath: cms.conf
+        env:
+          - name: CMS_CONFIG
+            value: /usr/local/etc/cms.conf
+      volumes:
+      - name: cms-config
+        configMap:
+          name: cms
+          defaultMode: 0755
+{{- end }}
+{{- end }}

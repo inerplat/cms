@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cms-admin
+  name: cms-admin
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cms-admin
+  template:
+    metadata:
+      labels:
+        app: cms-admin
+    spec:
+      serviceAccountName: cms
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - "cms-admin"
+      shareProcessNamespace: true   
+      containers:
+      - image: {{ .Values.admin.image.repository }}
+        imagePullPolicy: {{ .Values.admin.image.pullPolicy }}
+        name: ranking
+        command: ["cmsRankingWebServer"]
+        env:
+          - name: CMS_CONFIG
+            value: /usr/local/etc/cms.conf
+      - image: {{ .Values.admin.image.repository }}
+        imagePullPolicy: {{ .Values.admin.image.pullPolicy }}
+        name: resource
+        command: ["cmsResourceService", "-a", "1"]
+        env:
+          - name: CMS_CONFIG
+            value: /usr/local/etc/cms.conf
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: cms-config
+          mountPath: /usr/local/etc/cms.conf
+          subPath: cms.conf
+      volumes:
+      - name: codecov-volume
+        emptyDir: {}
+      - name: cms-config
+        configMap:
+          name: {{ .Values.admin.configMap.name }}
+          defaultMode: {{ .Values.admin.configMap.defaultMode }}

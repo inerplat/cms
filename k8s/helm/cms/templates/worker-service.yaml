@@ -1,0 +1,29 @@
+{{- if .Values.worker.enabled }}
+{{- range $i, $worker := until (int .Values.worker.replicas | default 1) }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cms-worker{{ add1 $i }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app: cms-worker{{ add1 $i }}
+spec:
+  ports:
+  - name: worker
+    port: 26000
+    protocol: TCP
+    targetPort: 26001
+  - name: resource
+    port: 28000
+    protocol: TCP
+    targetPort: 28000
+  - name: logging
+    port: 29000
+    protocol: TCP
+    targetPort: 29000
+  selector:
+    app: cms-worker{{ add1 $i }}
+  type: ClusterIP
+{{- end }}
+{{- end }}

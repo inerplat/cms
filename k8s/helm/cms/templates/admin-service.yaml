@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: cms-admin
+  name: cms-admin
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+  - port: 28000
+    protocol: TCP
+    targetPort: 28000
+    name: resource
+  - port: 28500
+    protocol: TCP
+    targetPort: 28500
+    name: scoring
+  - port: 22000
+    protocol: TCP
+    targetPort: 22000
+    name: checker
+  - port: 25000
+    protocol: TCP
+    targetPort: 25000
+    name: evaluation
+  - port: 21100
+    protocol: TCP
+    targetPort: 21100
+    name: admin-webserver
+  - port: 28600
+    protocol: TCP
+    targetPort: 28600
+    name: proxy
+  - port: 25123
+    protocol: TCP
+    targetPort: 25123
+    name: printing
+  - port: 29000
+    protocol: TCP
+    targetPort: 29000
+    name: logging
+  - port: 8888
+    protocol: TCP
+    targetPort: 8888
+    name: contest
+  - port: 8889
+    protocol: TCP
+    targetPort: 8889
+    name: admin
+  - port: 8890
+    protocol: TCP
+    targetPort: 8890
+    name: ranking
+  selector:
+    app: cms-admin
+  type: {{ .Values.admin.serviceType }}

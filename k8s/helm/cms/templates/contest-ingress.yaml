@@ -1,0 +1,30 @@
+{{- if .Values.contest.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    {{- range $key, $value := .Values.contest.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  name: cms-contest
+  namespace: {{ .Release.Namespace }}
+spec:
+  ingressClassName: nginx
+  {{- if .Values.contest.ingress.tls.enabled }}
+  tls:
+    - secretName: {{ .Values.contest.ingress.tls.secretName }}
+      hosts:
+        - {{ .Values.contest.ingress.host }}
+  {{- end }}
+  rules:
+  - host: {{ .Values.contest.ingress.host }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: cms-contest
+            port:
+              number: 8888
+        path: /
+        pathType: Prefix
+{{- end }}
