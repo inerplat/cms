@@ -9,6 +9,10 @@ metadata:
   labels:
     app: cms-worker{{ add1 $i }}
 spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 100%
   replicas: 1
   selector:
     matchLabels:
@@ -22,12 +26,18 @@ spec:
       - ip: "127.0.0.1"
         hostnames:
         - "cms-worker{{ add1 $i }}"
-      shareProcessNamespace: true
       containers:
       - name: worker
         image: inerplat/cms
         imagePullPolicy: Always
         command: ["/home/cmsuser/cms/scripts/cmsResourceService", "-a", "1"]
+        resources:
+          requests:
+            memory: 2Gi
+            cpu: '2'
+          limits:
+            memory: 2Gi
+            cpu: '2'
         securityContext:
           privileged: true
         lifecycle:

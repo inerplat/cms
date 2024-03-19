@@ -58,15 +58,15 @@ config: |
       "_section": "AsyncLibrary",
       "core_services":
       {
-          "LogService":        [["cms-admin", 29000]],
+          "LogService":        [["cms-admin", 29000], ["cms-contest", 29000], ["cms-worker1", 29000], ["cms-worker2", 29000], ["cms-worker3", 29000], ["cms-worker4", 29000]],
           "ResourceService":   [["cms-admin", 28000], ["cms-contest", 28000], ["cms-worker1", 28000], ["cms-worker2", 28000], ["cms-worker3", 28000], ["cms-worker4", 28000]],
-          "ScoringService":    [["cms-admin", 28500]],
-          "Checker":           [["cms-admin", 22000]],
-          "EvaluationService": [["cms-admin", 25000]],
+          "ScoringService":    [["cms-admin", 28500], ["cms-worker1", 28500], ["cms-worker2", 28500], ["cms-worker3", 28500], ["cms-worker4", 28500]],
+          "Checker":           [["cms-admin", 22000], ["cms-worker1", 22000], ["cms-worker2", 22000], ["cms-worker3", 22000], ["cms-worker4", 22000]],
+          "EvaluationService": [["cms-admin", 25000], ["cms-worker1", 25000], ["cms-worker2", 25000], ["cms-worker3", 25000], ["cms-worker4", 25000]],
           "Worker":            [["cms-worker1", 26000], ["cms-worker2", 26000], ["cms-worker3", 26000], ["cms-worker4", 26000]],
           "ContestWebServer":  [["cms-contest", 21000]],
           "AdminWebServer":    [["cms-admin", 21100]],
-          "ProxyService":      [["cms-admin", 28600]],
+          "ProxyService":      [["cms-admin", 28600], ["cms-contest", 28600]],
           "PrintingService":   [["cms-admin", 25123]]
           },
       "other_services":
@@ -99,7 +99,7 @@ config: |
       "_help": "for other than testing. It must be a 16 bytes long",
       "_help": "hexadecimal number. You can easily create a key calling:",
       "_help": "python -c 'from cmscommon import crypto; print(crypto.get_hex_random_key())'",
-      "secret_key":             "8e045a51e4b102ea803c06f92841a1fb",
+      "secret_key":             "0b5b7e5b0f51f2c739e3273268343622",
       "_help": "Whether Tornado prints debug information on stdout.",
       "tornado_debug": false,
       "_section": "ContestWebServer",
@@ -149,7 +149,7 @@ config: |
       "_help": "load balancing proxy (if any), just the backends. If any",
       "_help": "of them uses HTTPS specify a file with the certificates",
       "_help": "you trust.",
-      "rankings": ["http://usern4me:passw0rd@localhost:8890/"],
+      "rankings": ["http://cmsadmin:cmsadmin@localhost:8890/"],
       "https_certfile": null,
       "_section": "PrintingService",
       "_help": "Maximum size of a print job in bytes.",
