@@ -9,7 +9,7 @@ metadata:
   name: cms-score
   namespace: {{ .Release.Namespace }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.admin.score.ingress.ingressClassName }}
   {{- if .Values.admin.score.ingress.tls.enabled }}
   tls:
     - secretName: {{ .Values.admin.score.ingress.tls.secretName }}

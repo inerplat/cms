@@ -9,7 +9,7 @@ metadata:
   name: cms-contest
   namespace: {{ .Release.Namespace }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.contest.ingress.ingressClassName }}
   {{- if .Values.contest.ingress.tls.enabled }}
   tls:
     - secretName: {{ .Values.contest.ingress.tls.secretName }}

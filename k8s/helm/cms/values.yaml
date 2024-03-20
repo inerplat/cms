@@ -8,6 +8,7 @@ admin:
   serviceType: ClusterIP
   ingress:
     enabled: true
+    ingressClassName: alb
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
       nginx.ingress.kubernetes.io/proxy-body-size: 100m
@@ -18,6 +19,7 @@ admin:
   score:
     ingress:
       enabled: true
+      ingressClassName: alb
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-prod
       host: cms-score.inerplat.com
@@ -27,6 +29,7 @@ admin:
 contest:
   enabled: true
   ingress:
+    ingressClassName: alb
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
     tls:

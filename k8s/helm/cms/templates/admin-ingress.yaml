@@ -9,7 +9,7 @@ metadata:
   name: cms-admin
   namespace: {{ .Release.Namespace }}
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.admin.ingress.ingressClassName }}
   {{- if .Values.admin.ingress.tls.enabled }}
   tls:
     - secretName: {{ .Values.admin.ingress.tls.secretName }}
